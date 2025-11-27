@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Seletor de IA V5 (Expert Edition)</title>
+    <title>Seletor de IA V6 (Best of Both Worlds)</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -67,7 +67,7 @@
         }
 
         h1 { color: var(--accent); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
-        h2 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-main); line-height: 1.3; }
+        h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--text-main); line-height: 1.3; }
         
         .question-box { animation: slideIn 0.3s ease; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
         
@@ -120,7 +120,7 @@
             border: 2px solid rgba(255,255,255,0.2);
             z-index: 10;
         }
-        .rank-1 { background: var(--gold); transform: scale(1.2); }
+        .rank-1 { background: var(--gold); transform: scale(1.1); }
         .rank-2 { background: var(--silver); }
         .rank-3 { background: var(--bronze); color: #fff; }
         .rank-4, .rank-5 { background: var(--border); color: var(--text-muted); font-size: 0.9rem; }
@@ -133,7 +133,7 @@
         /* Scores (3 Barras) */
         .criteria-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Força 3 colunas */
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin: 15px 0;
             padding: 12px;
@@ -228,7 +228,7 @@
             .nav-panel { width: 100%; max-width: none; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; height: auto; overflow: visible; }
             .results-panel { width: 100%; height: auto; padding: 20px; overflow: visible; }
             .empty-state { display: none; }
-            .criteria-grid { grid-template-columns: 1fr; gap: 8px; } /* Barras em pilha no mobile */
+            .criteria-grid { grid-template-columns: 1fr; gap: 8px; }
             .pros-cons { grid-template-columns: 1fr; gap: 15px; }
         }
         
@@ -242,7 +242,7 @@
     <div class="nav-panel">
         <h1>
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M17.707 9.293l-5-5a1 1 0 00-1.414 0l-5 5a1 1 0 001.414 1.414L10 8.414l2.293 2.293a1 1 0 001.414 0z"/></svg>
-            Consultor de IA V5
+            Consultor de IA V6
         </h1>
         <div id="navContainer"></div>
         <button id="btnRestart" class="restart-btn hidden">⟲ Nova Consulta</button>
@@ -258,221 +258,261 @@
     <div class="results-panel" id="resultsPanel">
         <div id="placeholderState" class="empty-state">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-            <p>Responda às perguntas para gerar um<br>Ranking Top 5 detalhado.</p>
+            <p>Selecione uma opção para ver o Ranking Top 5<br>com detalhes de especialista.</p>
         </div>
         <div id="finalResults" class="hidden"></div>
     </div>
 </div>
 
 <script>
-    /* --- 1. BASE DE DADOS V5 (EXPANDIDA) --- */
+    /* --- 1. BASE DE DADOS COMPLETA (Rankings Top 5) --- */
     const outcomes = {
+        // --- ACADEMIC ---
         "academic_research": {
-            title: "Pesquisa Acadêmica (Validação)",
-            expertTip: "Nesta categoria, a **Alucinação** é o fator eliminatório. O ranking prioriza ferramentas que não apenas encontram o paper, mas 'ancoram' a resposta nele.",
-            factors: [
-                { name: "Veracidade (Grounding)", weight: "Crítico", desc: "A IA inventa fatos ou cita fontes reais?" },
-                { name: "Acesso ao Texto", weight: "Alto", desc: "Lê o PDF completo ou apenas o abstract?" },
-                { name: "Velocidade", weight: "Médio", desc: "Tempo de resposta para queries complexas." }
-            ],
+            title: "Pesquisa Acadêmica: Validação",
+            expertTip: "Prioridade: **Grounding**. Ferramentas que inventam citações são inúteis aqui.",
+            factors: [{name:"Veracidade", weight:"Crítico", desc:"Cita fontes reais?"}, {name:"Acesso PDF", weight:"Alto", desc:"Lê o texto completo?"}, {name:"Busca", weight:"Médio", desc:"Abrangência da base."}],
             tools: [
-                { id: "consensus", name: "Consensus", rank: 1, tags: ["Validado", "Science"], scores: { "Veracidade": 99, "Citações": 100, "Velocidade": 85 }, 
-                  pros: ["Busca exclusiva em base científica.", "Consensus Meter (visualiza o consenso).", "Snapshot de resultados."], 
-                  cons: ["Não serve para perguntas de opinião.", "Base em inglês predominante."], link: "https://consensus.app" },
-                { id: "elicit", name: "Elicit", rank: 2, tags: ["Deep Research"], scores: { "Veracidade": 95, "Profundidade": 100, "Velocidade": 60 }, 
-                  pros: ["Cria Matrizes de comparação.", "Extrai dados específicos (nº participantes).", "Excelente para revisão sistemática."], 
-                  cons: ["Curva de aprendizado alta.", "Lento para processar muitas fontes."], link: "https://elicit.com" },
-                { id: "scispace", name: "SciSpace", rank: 3, tags: ["Interactive"], scores: { "Veracidade": 90, "UX": 95, "Velocidade": 80 }, 
-                  pros: ["Copilot explica fórmulas e tabelas.", "Chat direto com o PDF.", "Bom para entender papers difíceis."], 
-                  cons: ["Foca mais em um paper por vez.", "Busca menos abrangente que Consensus."], link: "https://typeset.io" },
-                { id: "perplexity", name: "Perplexity", rank: 4, tags: ["Rápido"], scores: { "Veracidade": 85, "Velocidade": 98, "Amplitude": 95 }, 
-                  pros: ["Muito rápido.", "Descobre tópicos recentes.", "Interface amigável."], 
-                  cons: ["Pode misturar fontes não acadêmicas.", "Citações às vezes imprecisas."], link: "https://perplexity.ai" },
-                { id: "semanticscholar", name: "Semantic Scholar", rank: 5, tags: ["Database"], scores: { "Veracidade": 100, "UX": 50, "Velocidade": 90 }, 
-                  pros: ["Base de dados massiva.", "Gratuito.", "Grafo de citações."], 
-                  cons: ["É mais um buscador que uma IA generativa.", "Não responde perguntas, só lista papers."], link: "https://www.semanticscholar.org" }
+                {id:"consensus", name:"Consensus", rank:1, tags:["Validado"], scores:{"Veracidade":100, "Citações":100, "UX":90}, pros:["Snapshot de resultados.", "Consensus Meter."], cons:["Apenas papers (sem web).", "Inglês predominante."], link:"https://consensus.app"},
+                {id:"elicit", name:"Elicit", rank:2, tags:["Deep"], scores:{"Veracidade":95, "Profundidade":100, "UX":70}, pros:["Matriz de comparação.", "Extração de dados."], cons:["Lento.", "Curva de aprendizado."], link:"https://elicit.com"},
+                {id:"perplexity", name:"Perplexity", rank:3, tags:["Rápido"], scores:{"Veracidade":85, "Amplitude":95, "UX":95}, pros:["Muito rápido.", "Descobre tópicos novos."], cons:["Mistura fontes web/papers.", "Alucina às vezes."], link:"https://perplexity.ai"},
+                {id:"scispace", name:"SciSpace", rank:4, tags:["PDF"], scores:{"Veracidade":90, "UX":90, "Amplitude":80}, pros:["Chat com PDF.", "Explica fórmulas."], cons:["Foco em um paper por vez."], link:"https://typeset.io"},
+                {id:"scholar", name:"Semantic Scholar", rank:5, tags:["Database"], scores:{"Veracidade":100, "Amplitude":90, "UX":50}, pros:["Base massiva.", "Gratuito."], cons:["Não é chat generativo.", "Apenas busca."], link:"https://semanticscholar.org"}
             ]
         },
-        "coding_pro": {
-            title: "Coding Profissional (Produtividade)",
-            expertTip: "O modelo (LLM) é apenas 40% da equação. Os outros 60% são a **DX (Developer Experience)** e a capacidade de ler o contexto do repositório inteiro.",
-            factors: [
-                { name: "Integração (DX)", weight: "Crítico", desc: "Como se comporta dentro da IDE?" },
-                { name: "Inteligência Lógica", weight: "Alto", desc: "Qualidade do código gerado (menos bugs)." },
-                { name: "Contexto", weight: "Alto", desc: "Entende múltiplos arquivos ao mesmo tempo?" }
-            ],
+        "academic_study": {
+            title: "Estudo: Resumos & Flashcards",
+            expertTip: "Prioridade: **Síntese**. Capacidade de reduzir a carga cognitiva sem perder o sentido.",
+            factors: [{name:"Síntese", weight:"Crítico", desc:"Qualidade do resumo."}, {name:"Interatividade", weight:"Alto", desc:"Chat com o doc."}, {name:"Preço", weight:"Médio", desc:"Custo para estudantes."}],
             tools: [
-                { id: "cursor", name: "Cursor", rank: 1, tags: ["Game Changer", "IDE"], scores: { "Integração": 100, "Lógica": 95, "Contexto": 98 }, 
-                  pros: ["Edição multi-linha (Tab).", "Entende o projeto inteiro (RAG local).", "Usa Claude 3.5 Sonnet por baixo."], 
-                  cons: ["Exige migrar de editor (Fork do VSCode).", "Alguns bugs de UI."], link: "https://cursor.sh" },
-                { id: "windsurf", name: "Windsurf (Codeium)", rank: 2, tags: ["Context Aware"], scores: { "Integração": 95, "Lógica": 90, "Contexto": 95 }, 
-                  pros: ["Contexto profundo (Cascade).", "Ações de terminal integradas.", "Muito rápido."], 
-                  cons: ["Novo no mercado.", "Menos extensões que Cursor."], link: "https://codeium.com/windsurf" },
-                { id: "claude35", name: "Claude 3.5 (Web)", rank: 3, tags: ["SOTA Model"], scores: { "Integração": 40, "Lógica": 100, "Contexto": 85 }, 
-                  pros: ["A melhor lógica de programação atual.", "Artifacts permite preview visual.", "Menos alucinação em código."], 
-                  cons: ["Copy/Paste manual.", "Não vê seu repositório local."], link: "https://claude.ai" },
-                { id: "copilot", name: "GitHub Copilot", rank: 4, tags: ["Standard"], scores: { "Integração": 90, "Lógica": 75, "Contexto": 70 }, 
-                  pros: ["Onipresente nas empresas.", "Extensão fácil de instalar.", "Segurança Enterprise."], 
-                  cons: ["Modelo (GPT-4) está defasado vs Claude.", "Contexto limitado."], link: "https://github.com/features/copilot" },
-                { id: "supermaven", name: "Supermaven", rank: 5, tags: ["Speed"], scores: { "Integração": 85, "Lógica": 70, "Contexto": 100 }, 
-                  pros: ["Contexto de 1 Milhão de tokens.", "Extremamente rápido/baixa latência.", "Foco em autocomplete."], 
-                  cons: ["Menos 'inteligente' para arquitetura.", "UI minimalista demais."], link: "https://supermaven.com" }
+                {id:"notebooklm", name:"NotebookLM", rank:1, tags:["Google"], scores:{"Síntese":90, "Inovação":100, "Preço":100}, pros:["Gera Podcasts de áudio.", "Gratuito.", "Até 50 fontes."], cons:["Respostas curtas às vezes."], link:"https://notebooklm.google"},
+                {id:"scholarcy", name:"Scholarcy", rank:2, tags:["Flashcards"], scores:{"Síntese":95, "Estrutura":90, "Preço":70}, pros:["Gera flashcards automáticos.", "Extrai tabelas bem."], cons:["Interface antiga."], link:"https://scholarcy.com"},
+                {id:"scispace", name:"SciSpace", rank:3, tags:["Explicação"], scores:{"Síntese":85, "Interatividade":95, "Preço":80}, pros:["Explica matemática.", "Bom para leitura técnica."], cons:["Melhor para um arquivo só."], link:"https://typeset.io"},
+                {id:"chatpdf", name:"ChatPDF", rank:4, tags:["Rápido"], scores:{"Síntese":80, "UX":100, "Preço":60}, pros:["Sem login.", "Arrastar e soltar."], cons:["Perde contexto em docs longos."], link:"https://chatpdf.com"},
+                {id:"genei", name:"Genei", rank:5, tags:["Pro"], scores:{"Síntese":85, "Gestão":90, "Preço":50}, pros:["Gestão de projetos.", "Bloco de notas integrado."], cons:["Pago.", "Mais complexo."], link:"https://genei.io"}
             ]
         },
+        
+        // --- LOGIC / STEM ---
+        "logic_reasoning": {
+            title: "Lógica, Matemática & STEM",
+            expertTip: "Prioridade: **Chain of Thought**. Modelos que 'pensam' antes de responder.",
+            factors: [{name:"Raciocínio", weight:"Crítico", desc:"Passo a passo lógico."}, {name:"Exatidão", weight:"Crítico", desc:"Erro numérico."}, {name:"Velocidade", weight:"Baixo", desc:"Tempo de resposta."}],
+            tools: [
+                {id:"o1", name:"OpenAI o1", rank:1, tags:["SOTA"], scores:{"Raciocínio":100, "Exatidão":98, "Velocidade":20}, pros:["Resolve IMO Math.", "Planejamento complexo."], cons:["Lento.", "Caro."], link:"https://chatgpt.com"},
+                {id:"wolfram", name:"WolframGPT", rank:2, tags:["Plugin"], scores:{"Raciocínio":80, "Exatidão":100, "Velocidade":60}, pros:["Cálculo simbólico real.", "Não alucina números."], cons:["Requer ChatGPT Plus."], link:"https://wolfram.com/gpt"},
+                {id:"claude35", name:"Claude 3.5 Sonnet", rank:3, tags:["Equilíbrio"], scores:{"Raciocínio":90, "Exatidão":85, "Velocidade":90}, pros:["Inteligente e rápido.", "Artifacts visualiza gráficos."], cons:["Erra contas complexas."], link:"https://claude.ai"},
+                {id:"gemini15", name:"Gemini 1.5 Pro", rank:4, tags:["Math"], scores:{"Raciocínio":88, "Exatidão":85, "Velocidade":70}, pros:["Forte em benchmarks acadêmicos.", "Janela longa."], cons:["Filtros de segurança."], link:"https://aistudio.google.com"},
+                {id:"gpt4o", name:"GPT-4o", rank:5, tags:["Standard"], scores:{"Raciocínio":85, "Exatidão":80, "Velocidade":95}, pros:["Versátil.", "Multimodal."], cons:["Pior em lógica pura que o1."], link:"https://chatgpt.com"}
+            ]
+        },
+
+        // --- WRITING ---
         "writing_copy": {
-            title: "Escrita Criativa & Copywriting",
-            expertTip: "Evite o 'ChatGPT Voice' (palavras robóticas). O diferencial aqui é a capacidade de **mimetizar estilo** e nuance humana.",
-            factors: [
-                { name: "Humanidade", weight: "Crítico", desc: "Texto soa natural ou robótico?" },
-                { name: "Segurança/Filtros", weight: "Médio", desc: "Recusa tópicos polêmicos?" },
-                { name: "Ferramentas", weight: "Médio", desc: "Templates, SEO, Editor." }
-            ],
+            title: "Marketing & Copywriting",
+            expertTip: "Prioridade: **Humanidade**. Evitar o 'tom de IA'.",
+            factors: [{name:"Naturalidade", weight:"Crítico", desc:"Parece humano?"}, {name:"Ferramentas", weight:"Alto", desc:"Templates/Editor."}, {name:"Segurança", weight:"Médio", desc:"Filtros de conteúdo."}],
             tools: [
-                { id: "claude35", name: "Claude 3.5 Sonnet", rank: 1, tags: ["Natural"], scores: { "Humanidade": 98, "Nuance": 95, "Ferramentas": 60 }, 
-                  pros: ["Melhor prosa do mercado.", "Entende subtexto e humor.", "Grandes janelas de contexto."], 
-                  cons: ["Filtros de segurança sensíveis.", "Sem editor de texto rico."], link: "https://claude.ai" },
-                { id: "chatgpt", name: "ChatGPT-4o", rank: 2, tags: ["Versátil"], scores: { "Humanidade": 80, "Nuance": 75, "Ferramentas": 95 }, 
-                  pros: ["Canvas (editor novo) é excelente.", "Conectado à web.", "Multimodal (vê imagens)."], 
-                  cons: ["Tende a ser verborrágico e clichê.", "Estilo muito reconhecível."], link: "https://chatgpt.com" },
-                { id: "jasper", name: "Jasper", rank: 3, tags: ["Marketing"], scores: { "Humanidade": 85, "Nuance": 80, "Ferramentas": 100 }, 
-                  pros: ["Focado em Brand Voice.", "Templates para tudo (Ads, Blog).", "Integração SEO."], 
-                  cons: ["Caro para autônomos.", "Baseado em modelos de terceiros."], link: "https://jasper.ai" },
-                { id: "copyai", name: "Copy.ai", rank: 4, tags: ["Automation"], scores: { "Humanidade": 80, "Nuance": 70, "Ferramentas": 90 }, 
-                  pros: ["Workflows automatizados.", "Bom plano gratuito.", "Fácil de usar."], 
-                  cons: ["Pode ser repetitivo.", "Qualidade varia."], link: "https://copy.ai" },
-                { id: "writesonic", name: "Writesonic", rank: 5, tags: ["SEO"], scores: { "Humanidade": 75, "Nuance": 60, "Ferramentas": 85 }, 
-                  pros: ["Focado em artigos ranqueáveis.", "Integração com SurferSEO.", "Preço acessível."], 
-                  cons: ["Texto precisa de muita edição.", "Interface poluída."], link: "https://writesonic.com" }
+                {id:"claude35", name:"Claude 3.5 Sonnet", rank:1, tags:["Humano"], scores:{"Naturalidade":98, "Ferramentas":60, "Segurança":80}, pros:["Melhor prosa.", "Entende nuances."], cons:["Filtros rígidos."], link:"https://claude.ai"},
+                {id:"jasper", name:"Jasper", rank:2, tags:["Corp"], scores:{"Naturalidade":85, "Ferramentas":100, "Segurança":90}, pros:["Brand Voice.", "Templates de Marketing."], cons:["Caro.", "Baseado em GPT."], link:"https://jasper.ai"},
+                {id:"chatgpt", name:"ChatGPT-4o", rank:3, tags:["Canvas"], scores:{"Naturalidade":80, "Ferramentas":90, "Segurança":85}, pros:["Editor Canvas novo.", "Versátil."], cons:["Verborrágico.", "Clichês."], link:"https://chatgpt.com"},
+                {id:"copyai", name:"Copy.ai", rank:4, tags:["Auto"], scores:{"Naturalidade":75, "Ferramentas":85, "Segurança":80}, pros:["Workflows de automação.", "Plano Free bom."], cons:["Repetitivo."], link:"https://copy.ai"},
+                {id:"writesonic", name:"Writesonic", rank:5, tags:["SEO"], scores:{"Naturalidade":70, "Ferramentas":80, "Segurança":70}, pros:["Integração SEO.", "Barato."], cons:["Texto genérico."], link:"https://writesonic.com"}
             ]
         },
+
+        // --- CODING ---
+        "coding_pro": {
+            title: "Coding Profissional (IDE)",
+            expertTip: "Prioridade: **DX (Developer Experience)**. A integração vale mais que o modelo.",
+            factors: [{name:"Integração", weight:"Crítico", desc:"Fluidez na IDE."}, {name:"Lógica", weight:"Alto", desc:"Qualidade do código."}, {name:"Contexto", weight:"Alto", desc:"Lê o repo todo?"}],
+            tools: [
+                {id:"cursor", name:"Cursor", rank:1, tags:["Líder"], scores:{"Integração":100, "Lógica":95, "Contexto":98}, pros:["Edição Tab.", "Entende projeto todo."], cons:["Mudar de editor."], link:"https://cursor.sh"},
+                {id:"windsurf", name:"Windsurf", rank:2, tags:["Novo"], scores:{"Integração":95, "Lógica":90, "Contexto":95}, pros:["Contexto profundo.", "Ações de terminal."], cons:["Ecossistema novo."], link:"https://codeium.com"},
+                {id:"claude35", name:"Claude 3.5 Web", rank:3, tags:["Modelo"], scores:{"Integração":40, "Lógica":100, "Contexto":80}, pros:["Melhor lógica atual.", "Artifacts."], cons:["Copy/Paste manual."], link:"https://claude.ai"},
+                {id:"copilot", name:"GitHub Copilot", rank:4, tags:["Standard"], scores:{"Integração":90, "Lógica":75, "Contexto":70}, pros:["Padrão de mercado.", "Seguro."], cons:["Modelo defasado."], link:"https://github.com/features/copilot"},
+                {id:"supermaven", name:"Supermaven", rank:5, tags:["Speed"], scores:{"Integração":85, "Lógica":70, "Contexto":100}, pros:["1M Contexto.", "Muito rápido."], cons:["UI simples."], link:"https://supermaven.com"}
+            ]
+        },
+        "coding_local": {
+            title: "Coding Local (Privacidade)",
+            expertTip: "Prioridade: **Privacidade/Hardware**. Rodar sem enviar dados.",
+            factors: [{name:"Qualidade", weight:"Alto", desc:"Inteligência do modelo."}, {name:"Leveza", weight:"Crítico", desc:"Roda em GPU consumer?"}, {name:"Setup", weight:"Médio", desc:"Facilidade."}],
+            tools: [
+                {id:"deepseek", name:"DeepSeek V2", rank:1, tags:["SOTA"], scores:{"Qualidade":95, "Leveza":60, "Setup":50}, pros:["Nível GPT-4.", "Janela grande."], cons:["Pesado (VRAM)."], link:"https://github.com/deepseek-ai"},
+                {id:"qwen", name:"Qwen 2.5", rank:2, tags:["Balanced"], scores:{"Qualidade":90, "Leveza":90, "Setup":60}, pros:["Versões leves (7B/14B).", "Rápido."], cons:["Menos filtros."], link:"https://huggingface.co/Qwen"},
+                {id:"llama31", name:"Llama 3.1", rank:3, tags:["Meta"], scores:{"Qualidade":88, "Leveza":70, "Setup":80}, pros:["Padrão da indústria.", "Muito suporte."], cons:["Versão 70B é pesada."], link:"https://llama.meta.com"},
+                {id:"mistral", name:"Mistral Large 2", rank:4, tags:["Efficient"], scores:{"Qualidade":85, "Leveza":85, "Setup":70}, pros:["Muito eficiente.", "Bom para RAG."], cons:["Licença varia."], link:"https://mistral.ai"},
+                {id:"ollama", name:"Ollama (Runner)", rank:5, tags:["App"], scores:{"Qualidade":0, "Leveza":100, "Setup":100}, pros:["Roda qualquer um acima.", "Fácil de instalar."], cons:["É o executor, não modelo."], link:"https://ollama.com"}
+            ]
+        },
+
+        // --- DOCS / RAG ---
         "rag_deep": {
-            title: "Análise Profunda de Docs (RAG)",
-            expertTip: "O gargalo é a **Janela de Contexto**. RAG tradicional (fatiar o PDF) perde o contexto global. Modelos de janela longa (Long Context) leem o livro inteiro de uma vez.",
-            factors: [
-                { name: "Capacidade (Tokens)", weight: "Crítico", desc: "Quanto texto cabe na memória?" },
-                { name: "Raciocínio no Doc", weight: "Alto", desc: "Consegue conectar pontos distantes?" },
-                { name: "Preço", weight: "Médio", desc: "Custo por análise." }
-            ],
+            title: "Análise Profunda (Livros/Docs)",
+            expertTip: "Prioridade: **Janela de Contexto**. Ler tudo de uma vez sem fatiar.",
+            factors: [{name:"Capacidade", weight:"Crítico", desc:"Tamanho da memória."}, {name:"Raciocínio", weight:"Alto", desc:"Conecta pontos?"}, {name:"Preço", weight:"Médio", desc:"Custo."}],
             tools: [
-                { id: "gemini15", name: "Gemini 1.5 Pro", rank: 1, tags: ["2M Tokens"], scores: { "Capacidade": 100, "Raciocínio": 90, "Preço": 60 }, 
-                  pros: ["Janela massiva (2M tokens).", "Analisa vídeo e áudio nativamente.", "Ótimo recall de informação."], 
-                  cons: ["AI Studio é complexo para iniciantes.", "Filtros de segurança chatos."], link: "https://aistudio.google.com" },
-                { id: "notebooklm", name: "NotebookLM", rank: 2, tags: ["Study Tool"], scores: { "Capacidade": 90, "Raciocínio": 85, "Preço": 100 }, 
-                  pros: ["Gratuito.", "Gera Podcasts de áudio.", "Cita as fontes ao lado da resposta."], 
-                  cons: ["Limitado a 50 fontes.", "Respostas às vezes superficiais."], link: "https://notebooklm.google" },
-                { id: "claudeopus", name: "Claude 3 Opus", rank: 3, tags: ["Smartest"], scores: { "Capacidade": 80, "Raciocínio": 98, "Preço": 40 }, 
-                  pros: ["Compreensão de texto superior.", "Menos alucinação.", "Excelente escrita."], 
-                  cons: ["Contexto menor que Gemini (200k).", "Caro ($20/mês)."], link: "https://claude.ai" },
-                { id: "chatgpt_rag", name: "ChatGPT (Upload)", rank: 4, tags: ["Standard"], scores: { "Capacidade": 70, "Raciocínio": 80, "Preço": 80 }, 
-                  pros: ["Fácil de usar.", "Analisa dados (Excel/CSV) bem.", "Multimodal."], 
-                  cons: ["Esquece o início de documentos longos.", "RAG impreciso às vezes."], link: "https://chatgpt.com" },
-                { id: "humata", name: "Humata", rank: 5, tags: ["Enterprise"], scores: { "Capacidade": 60, "Raciocínio": 85, "Preço": 30 }, 
-                  pros: ["Citações clicáveis perfeitas.", "Segurança de dados.", "Focado em jurídico."], 
-                  cons: ["Caro.", "Focado apenas em texto."], link: "https://humata.ai" }
+                {id:"gemini15", name:"Gemini 1.5 Pro", rank:1, tags:["2M"], scores:{"Capacidade":100, "Raciocínio":90, "Preço":60}, pros:["2 Milhões de tokens.", "Lê vídeo/áudio."], cons:["AI Studio complexo."], link:"https://aistudio.google.com"},
+                {id:"notebooklm", name:"NotebookLM", rank:2, tags:["Study"], scores:{"Capacidade":90, "Raciocínio":85, "Preço":100}, pros:["Wiki automática.", "Gratuito."], cons:["Limite de fontes."], link:"https://notebooklm.google"},
+                {id:"claudeopus", name:"Claude 3 Opus", rank:3, tags:["Smart"], scores:{"Capacidade":80, "Raciocínio":98, "Preço":40}, pros:["Melhor compreensão.", "Menos erro."], cons:["Caro ($20)."], link:"https://claude.ai"},
+                {id:"chatgptupload", name:"ChatGPT", rank:4, tags:["Easy"], scores:{"Capacidade":70, "Raciocínio":80, "Preço":80}, pros:["Multimodal.", "Fácil."], cons:["Esquece dados no meio."], link:"https://chatgpt.com"},
+                {id:"cohere", name:"Cohere Command", rank:5, tags:["Enterprise"], scores:{"Capacidade":75, "Raciocínio":85, "Preço":50}, pros:["Focado em RAG empresarial.", "Citações."], cons:["Foco API."], link:"https://cohere.com"}
             ]
         },
+        "rag_quick": {
+            title: "Busca Rápida em PDF",
+            expertTip: "Prioridade: **Velocidade e Citação**. Achar a cláusula certa agora.",
+            factors: [{name:"Citação", weight:"Crítico", desc:"Linka para a página?"}, {name:"Velocidade", weight:"Alto", desc:"Tempo resposta."}, {name:"UX", weight:"Médio", desc:"Facilidade."}],
+            tools: [
+                {id:"humata", name:"Humata", rank:1, tags:["Jurídico"], scores:{"Citação":100, "Velocidade":90, "UX":80}, pros:["Highlight exato.", "Seguro."], cons:["Caro."], link:"https://humata.ai"},
+                {id:"chatpdf", name:"ChatPDF", rank:2, tags:["Rápido"], scores:{"Citação":80, "Velocidade":100, "UX":100}, pros:["Sem login.", "Arrastar e soltar."], cons:["Arquivo único."], link:"https://chatpdf.com"},
+                {id:"acrobat", name:"Acrobat AI", rank:3, tags:["Nativo"], scores:{"Citação":90, "Velocidade":70, "UX":90}, pros:["Já instalado.", "Conveniente."], cons:["Inteligência média."], link:"https://adobe.com"},
+                {id:"askyourpdf", name:"AskYourPDF", rank:4, tags:["Plugin"], scores:{"Citação":85, "Velocidade":80, "UX":70}, pros:["Plugin ChatGPT.", "API."], cons:["UI poluída."], link:"https://askyourpdf.com"},
+                {id:"pdfai", name:"PDF.ai", rank:5, tags:["Simple"], scores:{"Citação":80, "Velocidade":85, "UX":80}, pros:["Simples.", "Barato."], cons:["Básico."], link:"https://pdf.ai"}
+            ]
+        },
+
+        // --- MULTIMEDIA ---
         "image_gen": {
             title: "Geração de Imagens",
-            expertTip: "A escolha é entre **Beleza Artística** (Midjourney) vs. **Obediência ao Prompt** (Flux/DALL-E).",
-            factors: [
-                { name: "Estética", weight: "Alto", desc: "Qualidade visual e realismo." },
-                { name: "Prompt", weight: "Crítico", desc: "Segue instruções complexas?" },
-                { name: "Texto", weight: "Médio", desc: "Escreve palavras corretamente?" }
-            ],
+            expertTip: "Prioridade: **Estética vs Prompt**. Beleza vs Obediência.",
+            factors: [{name:"Estética", weight:"Alto", desc:"Qualidade visual."}, {name:"Prompt", weight:"Crítico", desc:"Obediência."}, {name:"Texto", weight:"Médio", desc:"Tipografia."}],
             tools: [
-                { id: "midjourney", name: "Midjourney v6.1", rank: 1, tags: ["Artístico"], scores: { "Estética": 100, "Prompt": 85, "Texto": 70 }, 
-                  pros: ["Textura e iluminação imbatíveis.", "Estilo próprio muito bonito.", "Personalização (Sref)."], 
-                  cons: ["Uso via Discord (UX ruim).", "Pago e sem trial."], link: "https://midjourney.com" },
-                { id: "flux", name: "Flux.1 (Dev/Pro)", rank: 2, tags: ["Prompt King"], scores: { "Estética": 90, "Prompt": 98, "Texto": 85 }, 
-                  pros: ["Segue instruções complexas perfeitamente.", "Realismo fotográfico cru.", "Opções Open Source."], 
-                  cons: ["Estilo visual menos 'artístico' que MJ.", "Exige hardware forte localmente."], link: "https://blackforestlabs.ai" },
-                { id: "ideogram", name: "Ideogram 2.0", rank: 3, tags: ["Typography"], scores: { "Estética": 85, "Prompt": 90, "Texto": 100 }, 
-                  pros: ["Melhor para gerar textos e logos.", "Design gráfico e posters.", "Bons templates."], 
-                  cons: ["Resolução menor em alguns casos.", "Estilo às vezes plastificado."], link: "https://ideogram.ai" },
-                { id: "dalle3", name: "DALL-E 3", rank: 4, tags: ["Easy"], scores: { "Estética": 75, "Prompt": 90, "Texto": 80 }, 
-                  pros: ["Integrado ao ChatGPT.", "Fácil de conversar/refinar.", "Entende linguagem natural."], 
-                  cons: ["Visual 'CGI' muito óbvio.", "Muitas restrições de copyright/censura."], link: "https://chatgpt.com" },
-                { id: "stable", name: "Stable Diffusion 3.5", rank: 5, tags: ["Control"], scores: { "Estética": 85, "Prompt": 80, "Texto": 60 }, 
-                  pros: ["Controle total (ControlNet).", "Roda localmente.", "Sem censura (na versão aberta)."], 
-                  cons: ["Difícil de instalar/usar.", "Inconsistente."], link: "https://stability.ai" }
+                {id:"midjourney", name:"Midjourney", rank:1, tags:["Arte"], scores:{"Estética":100, "Prompt":85, "Texto":70}, pros:["Visual imbatível.", "Estilo único."], cons:["Discord.", "Pago."], link:"https://midjourney.com"},
+                {id:"flux", name:"Flux.1", rank:2, tags:["Realismo"], scores:{"Estética":90, "Prompt":98, "Texto":85}, pros:["Segue tudo.", "Open Weights."], cons:["Exige GPU local."], link:"https://blackforestlabs.ai"},
+                {id:"ideogram", name:"Ideogram", rank:3, tags:["Texto"], scores:{"Estética":85, "Prompt":90, "Texto":100}, pros:["Logos e Posters.", "Tipografia perfeita."], cons:["Resolução."], link:"https://ideogram.ai"},
+                {id:"dalle3", name:"DALL-E 3", rank:4, tags:["Easy"], scores:{"Estética":75, "Prompt":90, "Texto":80}, pros:["Fácil (ChatGPT).", "Conversacional."], cons:["Visual 'fake'."], link:"https://chatgpt.com"},
+                {id:"stable", name:"Stable Diff 3.5", rank:5, tags:["Control"], scores:{"Estética":80, "Prompt":80, "Texto":60}, pros:["Controle total.", "Local."], cons:["Difícil usar."], link:"https://stability.ai"}
+            ]
+        },
+        "video_creative": {
+            title: "Vídeo Criativo (Cinematográfico)",
+            expertTip: "Prioridade: **Consistência**. Manter o rosto/objeto igual ao longo do vídeo.",
+            factors: [{name:"Controle", weight:"Crítico", desc:"Câmera/Movimento."}, {name:"Realismo", weight:"Alto", desc:"Física."}, {name:"Duração", weight:"Médio", desc:"Tempo do clipe."}],
+            tools: [
+                {id:"runway", name:"Runway Gen-3", rank:1, tags:["Pro"], scores:{"Controle":95, "Realismo":90, "Duração":70}, pros:["Motion Brush.", "Controle fino."], cons:["Caro."], link:"https://runwayml.com"},
+                {id:"luma", name:"Luma Dream", rank:2, tags:["Rápido"], scores:{"Controle":80, "Realismo":85, "Duração":70}, pros:["Gera rápido.", "Plano free."], cons:["Menos controle."], link:"https://lumalabs.ai"},
+                {id:"kling", name:"Kling AI", rank:3, tags:["Real"], scores:{"Controle":70, "Realismo":95, "Duração":90}, pros:["Vídeos longos (10s).", "Muito real."], cons:["Fila espera."], link:"https://klingai.com"},
+                {id:"pika", name:"Pika Art", rank:4, tags:["Effects"], scores:{"Controle":85, "Realismo":75, "Duração":60}, pros:["Efeitos (esmagar, derreter).", "Lip Sync."], cons:["Qualidade visual menor."], link:"https://pika.art"},
+                {id:"hailuo", name:"Hailuo (MiniMax)", rank:5, tags:["Asian"], scores:{"Controle":60, "Realismo":92, "Duração":80}, pros:["Movimento fluido.", "Alta resolução."], cons:["Acesso difícil."], link:"https://hailuo.ai"}
             ]
         },
         "video_avatar": {
-            title: "Vídeo: Avatares & Apresentações",
-            expertTip: "Foco total em **Lip Sync** (Sincronia Labial) e naturalidade dos micro-movimentos faciais. Evite o 'Uncanny Valley'.",
-            factors: [
-                { name: "Realismo", weight: "Crítico", desc: "Parece humano ou boneco?" },
-                { name: "Sincronia (LipSync)", weight: "Alto", desc: "Boca bate com o áudio?" },
-                { name: "Preço/Minuto", weight: "Médio", desc: "Custo benefício." }
-            ],
+            title: "Vídeo Avatar (Corporativo)",
+            expertTip: "Prioridade: **Lip Sync**. A boca tem que bater perfeito.",
+            factors: [{name:"LipSync", weight:"Crítico", desc:"Sincronia."}, {name:"Realismo", weight:"Alto", desc:"Parece humano?"}, {name:"Preço", weight:"Médio", desc:"Custo."}],
             tools: [
-                { id: "heygen", name: "HeyGen", rank: 1, tags: ["Líder"], scores: { "Realismo": 98, "Sincronia": 100, "Preço/Minuto": 40 }, 
-                  pros: ["Melhor qualidade visual atual.", "Tradução de vídeo mantendo a voz.", "Clonagem de avatar rápida."], 
-                  cons: ["Planos caros para alta resolução.", "Sistema de créditos confuso."], link: "https://heygen.com" },
-                { id: "synthesia", name: "Synthesia", rank: 2, tags: ["Corp"], scores: { "Realismo": 90, "Sincronia": 90, "Preço/Minuto": 50 }, 
-                  pros: ["Focado em empresas (SOC2).", "Editor de slides embutido robusto.", "Muitos avatares stock."], 
-                  cons: ["Avatares um pouco mais rígidos.", "Menos inovação recente que HeyGen."], link: "https://synthesia.io" },
-                { id: "hedra", name: "Hedra", rank: 3, tags: ["Expressive"], scores: { "Realismo": 85, "Sincronia": 95, "Preço/Minuto": 80 }, 
-                  pros: ["Expressões faciais extremas (canta, grita).", "Controle de personagem.", "Rápido."], 
-                  cons: ["Ainda em beta/evolução.", "Fundo às vezes instável."], link: "https://hedra.com" },
-                { id: "did", name: "D-ID", rank: 4, tags: ["API"], scores: { "Realismo": 80, "Sincronia": 85, "Preço/Minuto": 70 }, 
-                  pros: ["Anima fotos estáticas (Live Portrait).", "API robusta para devs.", "Interatividade em tempo real."], 
-                  cons: ["Qualidade visual inferior para vídeo full.", "Movimento de cabeça repetitivo."], link: "https://d-id.com" },
-                { id: "dupdub", name: "DupDub", rank: 5, tags: ["All-in-One"], scores: { "Realismo": 75, "Sincronia": 80, "Preço/Minuto": 90 }, 
-                  pros: ["Suite completa (escrita, voz, vídeo).", "App mobile bom.", "Preço competitivo."], 
-                  cons: ["Qualidade de avatar inferior aos líderes.", "Interface genérica."], link: "https://dupdub.com" }
+                {id:"heygen", name:"HeyGen", rank:1, tags:["Líder"], scores:{"LipSync":100, "Realismo":98, "Preço":40}, pros:["Tradução de vídeo.", "Qualidade top."], cons:["Caro."], link:"https://heygen.com"},
+                {id:"synthesia", name:"Synthesia", rank:2, tags:["Corp"], scores:{"LipSync":90, "Realismo":90, "Preço":50}, pros:["Slides integrados.", "Empresarial."], cons:["Avatares rígidos."], link:"https://synthesia.io"},
+                {id:"hedra", name:"Hedra", rank:3, tags:["Expressão"], scores:{"LipSync":95, "Realismo":85, "Preço":80}, pros:["Canta e grita.", "Controle total."], cons:["Beta."], link:"https://hedra.com"},
+                {id:"did", name:"D-ID", rank:4, tags:["API"], scores:{"LipSync":85, "Realismo":80, "Preço":70}, pros:["Anima fotos.", "API forte."], cons:["Menos real."], link:"https://d-id.com"},
+                {id:"dupdub", name:"DupDub", rank:5, tags:["Mobile"], scores:{"LipSync":80, "Realismo":75, "Preço":90}, pros:["App bom.", "Suite completa."], cons:["Genérico."], link:"https://dupdub.com"}
+            ]
+        },
+        "audio_tts": {
+            title: "Voz Sintética (TTS)",
+            expertTip: "Prioridade: **Emoção**. Vozes que respiram e pausam.",
+            factors: [{name:"Emoção", weight:"Crítico", desc:"Expressividade."}, {name:"Clonagem", weight:"Alto", desc:"Cópia de voz."}, {name:"Custo", weight:"Médio", desc:"Preço."}],
+            tools: [
+                {id:"eleven", name:"ElevenLabs", rank:1, tags:["SOTA"], scores:{"Emoção":100, "Clonagem":100, "Custo":60}, pros:["Indistinguível.", "Clonagem rápida."], cons:["Custo por caractere."], link:"https://elevenlabs.io"},
+                {id:"openai", name:"OpenAI Voice", rank:2, tags:["Rápido"], scores:{"Emoção":90, "Clonagem":0, "Custo":80}, pros:["Latência baixa.", "Barato."], cons:["Poucas vozes."], link:"https://platform.openai.com"},
+                {id:"playht", name:"Play.ht", rank:3, tags:["Variedade"], scores:{"Emoção":85, "Clonagem":90, "Custo":70}, pros:["Muitos modelos.", "Parrot mode."], cons:["UI confusa."], link:"https://play.ht"},
+                {id:"murf", name:"Murf.ai", rank:4, tags:["Studio"], scores:{"Emoção":80, "Clonagem":70, "Custo":60}, pros:["Editor de vídeo junto.", "Vozes de AD."], cons:["Robótico as vezes."], link:"https://murf.ai"},
+                {id:"speechify", name:"Speechify", rank:5, tags:["Reader"], scores:{"Emoção":85, "Clonagem":80, "Custo":50}, pros:["Foco em leitura (livros).", "Vozes de famosos."], cons:["Foco app consumo."], link:"https://speechify.com"}
+            ]
+        },
+        "audio_transcribe": {
+            title: "Transcrição (Speech-to-Text)",
+            expertTip: "Prioridade: **Diarization**. Saber quem falou o quê.",
+            factors: [{name:"Precisão", weight:"Crítico", desc:"Acerto palavras."}, {name:"Diarization", weight:"Alto", desc:"Separa vozes?"}, {name:"Editor", weight:"Médio", desc:"Facilidade."}],
+            tools: [
+                {id:"sonix", name:"Sonix", rank:1, tags:["Pro"], scores:{"Precisão":98, "Diarization":95, "Editor":100}, pros:["Melhor editor de texto.", "Tradução."], cons:["Pago por hora."], link:"https://sonix.ai"},
+                {id:"otter", name:"Otter.ai", rank:2, tags:["Meeting"], scores:{"Precisão":85, "Diarization":90, "Editor":90}, pros:["Entra no Zoom/Meet.", "Atas auto."], cons:["Português fraco."], link:"https://otter.ai"},
+                {id:"whisper", name:"Whisper (OpenAI)", rank:3, tags:["Free"], scores:{"Precisão":95, "Diarization":0, "Editor":0}, pros:["Modelo mais preciso.", "Gratuito local."], cons:["Sem interface.", "Técnico."], link:"https://github.com/openai/whisper"},
+                {id:"fireflies", name:"Fireflies", rank:4, tags:["Team"], scores:{"Precisão":85, "Diarization":85, "Editor":85}, pros:["Analisa sentimento.", "Integra CRM."], cons:["UI densa."], link:"https://fireflies.ai"},
+                {id:"descript", name:"Descript", rank:5, tags:["Editor"], scores:{"Precisão":90, "Diarization":80, "Editor":95}, pros:["Edita áudio apagando texto.", "Studio completo."], cons:["Pesado."], link:"https://descript.com"}
             ]
         }
     };
 
-    /* --- 2. ÁRVORE DE DECISÃO --- */
+    /* --- 2. ÁRVORE DE DECISÃO V4 (Granular) --- */
     const decisionTree = {
         question: "Qual o seu objetivo principal?",
         options: [
             {
-                label: "Pesquisa Acadêmica",
+                label: "Pesquisa Acadêmica & Estudo",
                 next: {
-                    question: "Tipo de Pesquisa?",
+                    question: "O que você quer fazer?",
                     options: [
-                        { label: "Validar Fatos & Papers", resultId: "academic_research" },
-                        { label: "Analisar PDFs (RAG)", resultId: "rag_deep" }
+                        { label: "Validar Fatos & Referências", resultId: "academic_research" },
+                        { label: "Resumir & Flashcards", resultId: "academic_study" }
+                    ]
+                }
+            },
+            {
+                label: "Escrita & Raciocínio",
+                next: {
+                    question: "Qual o tipo de tarefa?",
+                    options: [
+                        { label: "Lógica Pura, Matemática, STEM", resultId: "logic_reasoning" },
+                        { label: "Marketing, Copywriting & Criatividade", resultId: "writing_copy" }
                     ]
                 }
             },
             {
                 label: "Programação (Coding)",
                 next: {
-                    question: "Prioridade?",
+                    question: "Ambiente de Desenvolvimento?",
                     options: [
-                        { label: "Produtividade Profissional", resultId: "coding_pro" },
-                        { label: "Scripts Rápidos / Aprendizado", resultId: "coding_pro" } // Simplificado para demo
+                        { label: "Profissional (Produtividade na IDE)", resultId: "coding_pro" },
+                        { label: "Local / Offline (Privacidade)", resultId: "coding_local" }
                     ]
                 }
             },
             {
-                label: "Escrita & Marketing",
+                label: "Documentos & Dados (RAG)",
                 next: {
-                    question: "Foco do Texto?",
+                    question: "Complexidade da Análise?",
                     options: [
-                        { label: "Copywriting & Blog", resultId: "writing_copy" },
-                        { label: "Análise de Documentos", resultId: "rag_deep" }
+                        { label: "Análise Profunda (Livros/Múltiplos Docs)", resultId: "rag_deep" },
+                        { label: "Busca Rápida (Contratos/Faturas)", resultId: "rag_quick" }
                     ]
                 }
             },
             {
-                label: "Multimídia (Img/Video)",
+                label: "Multimídia (Img/Vid/Audio)",
                 next: {
-                    question: "O que criar?",
+                    question: "Qual tipo de mídia?",
                     options: [
-                        { label: "Imagens Estáticas", resultId: "image_gen" },
-                        { label: "Vídeo Apresentação (Avatar)", resultId: "video_avatar" }
+                        { label: "Imagens", resultId: "image_gen" },
+                        { 
+                            label: "Vídeo", 
+                            next: {
+                                question: "Estilo do Vídeo?",
+                                options: [
+                                    { label: "Criativo / Cinematográfico", resultId: "video_creative" },
+                                    { label: "Avatares Falantes / Corporativo", resultId: "video_avatar" }
+                                ]
+                            }
+                        },
+                        { 
+                            label: "Áudio", 
+                            next: {
+                                question: "Entrada ou Saída?",
+                                options: [
+                                    { label: "Criar Voz (TTS)", resultId: "audio_tts" },
+                                    { label: "Transcrever (STT)", resultId: "audio_transcribe" }
+                                ]
+                            }
+                        }
                     ]
                 }
             }
         ]
     };
 
-    /* --- 3. LÓGICA --- */
+    /* --- 3. LÓGICA DE EXECUÇÃO (V5 Engine) --- */
     const navContainer = document.getElementById('navContainer');
     const finalResults = document.getElementById('finalResults');
     const placeholder = document.getElementById('placeholderState');
@@ -517,7 +557,7 @@
         btnRestart.classList.remove('hidden');
         finalResults.innerHTML = ''; 
 
-        // Gera tabela de pesos
+        // Tabela de Pesos
         const factorsRows = data.factors.map(f => {
             let badgeClass = '';
             if(f.weight === 'Crítico') badgeClass = 'w-critical';
