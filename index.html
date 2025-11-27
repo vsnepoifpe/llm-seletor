@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seletor de IA - vsnepoifpe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Seletor de IA - Mobile Ready</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -20,25 +20,26 @@
             --danger: #ef4444;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
             display: flex;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Desktop: sem scroll na janela principal */
         }
 
         /* Scrollbar customizada */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
         .container { display: flex; width: 100%; height: 100%; }
 
-        /* PAINEL ESQUERDO (Navegação) */
+        /* --- PAINEL ESQUERDO (Navegação) --- */
         .nav-panel {
             flex: 1;
             padding: 30px;
@@ -46,12 +47,13 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            max-width: 420px;
+            max-width: 450px;
             min-width: 350px;
-            position: relative;
+            background: var(--bg-color);
+            z-index: 2;
         }
 
-        /* PAINEL DIREITO (Resultados) */
+        /* --- PAINEL DIREITO (Resultados) --- */
         .results-panel {
             flex: 2;
             padding: 40px;
@@ -61,10 +63,10 @@
             flex-direction: column;
         }
 
-        h1 { color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem;}
-        h2 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-main); }
+        h1 { color: var(--accent); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        h2 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-main); line-height: 1.3; }
         
-        .question-box { animation: slideIn 0.3s ease; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
+        .question-box { animation: slideIn 0.3s ease; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
         
         .btn-option {
             display: block;
@@ -73,86 +75,90 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 18px;
-            margin-bottom: 12px;
-            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 10px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 1rem;
             position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .btn-option:hover { background: var(--card-hover); border-color: var(--accent); padding-left: 25px; }
-        .btn-option.selected { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; padding-left: 25px; }
-        .btn-option.selected::after { content: '➔'; position: absolute; right: 20px; }
+        .btn-option:active { transform: scale(0.98); }
+        .btn-option:hover { background: var(--card-hover); border-color: var(--accent); }
+        .btn-option.selected { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; padding-left: 20px; }
+        .btn-option:disabled { opacity: 0.6; cursor: default; }
 
         /* Estilos do Ranking */
         .ranking-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 25px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             position: relative;
             animation: fadeIn 0.5s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         
         .rank-badge {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             color: #000;
             border: 2px solid rgba(255,255,255,0.2);
+            z-index: 10;
         }
         .rank-1 { background: var(--gold); }
         .rank-2 { background: var(--silver); }
         .rank-3 { background: var(--bronze); color: #fff; }
 
-        .card-header { margin-bottom: 20px; padding-right: 60px; } 
-        .tool-name { font-size: 1.8rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px; }
-        .tool-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-        .tag { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+        .card-header { margin-bottom: 15px; padding-right: 40px; }
+        .tool-name { font-size: 1.5rem; font-weight: bold; color: var(--text-main); margin-bottom: 8px; }
+        .tool-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
         
         .criteria-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-            padding: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+            padding: 12px;
             background: rgba(0,0,0,0.2);
-            border-radius: 8px;
+            border-radius: 10px;
         }
         
-        .score-item label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .progress-bar { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; }
+        .score-item label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .progress-bar { height: 6px; background: #334155; border-radius: 3px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent); transition: width 1s ease; }
 
-        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.95rem; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
         .pros { color: var(--success); }
         .cons { color: var(--danger); }
 
         .expert-tip {
-            background: rgba(56, 189, 248, 0.05);
+            background: rgba(56, 189, 248, 0.08);
             border-left: 4px solid var(--accent);
             padding: 20px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
         }
-        .expert-tip h4 { margin: 0 0 10px 0; color: var(--accent); display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
+        .expert-tip h4 { margin: 0 0 10px 0; color: var(--accent); display: flex; align-items: center; gap: 10px; font-size: 1rem; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         
         .restart-btn {
             margin-top: 20px;
@@ -160,60 +166,114 @@
             border: 1px solid var(--border);
             color: var(--text-muted);
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
             transition: all 0.2s;
+            font-size: 0.9rem;
         }
         .restart-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56, 189, 248, 0.1); }
         
         .action-link {
-            display: inline-block;
+            display: block;
+            text-align: center;
             text-decoration: none;
             color: var(--bg-color);
             background-color: var(--accent);
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             font-weight: bold;
             font-size: 0.9rem;
+            margin-top: 15px;
             transition: opacity 0.2s;
         }
         .action-link:hover { opacity: 0.9; }
 
-        .empty-state { text-align: center; color: var(--text-muted); margin-top: 15vh; opacity: 0.5; }
-        .empty-state svg { width: 80px; height: 80px; margin-bottom: 20px; }
+        .empty-state { text-align: center; color: var(--text-muted); margin-top: 15vh; opacity: 0.5; padding: 20px; }
+        .empty-state svg { width: 60px; height: 60px; margin-bottom: 20px; }
 
-        /* FOOTER ESTILO */
+        /* Footer */
         .app-footer {
             margin-top: auto;
             padding-top: 20px;
             border-top: 1px solid var(--border);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             text-align: center;
         }
-        .app-footer a { color: var(--text-muted); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: color 0.2s; margin-bottom: 5px; }
-        .app-footer a:hover { color: var(--accent); }
-        .license-text { font-size: 0.75rem; opacity: 0.6; }
+        .app-footer a { color: var(--text-muted); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 5px; }
+
+        /* =========================================
+           MOBILE RESPONSIVENESS (Media Queries)
+           ========================================= */
+        @media (max-width: 900px) {
+            body { 
+                height: auto; 
+                overflow-y: auto; /* Permite scroll na página toda */
+            }
+            
+            .container { 
+                flex-direction: column; 
+                height: auto; 
+                overflow: visible;
+            }
+
+            .nav-panel {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 20px;
+                height: auto; /* Altura automática baseada no conteúdo */
+                overflow: visible;
+            }
+
+            .results-panel {
+                width: 100%;
+                height: auto;
+                padding: 20px;
+                overflow: visible;
+            }
+
+            /* Esconder estado vazio no mobile para economizar espaço */
+            .empty-state { display: none; }
+            
+            h1 { font-size: 1rem; margin-bottom: 1rem; }
+            h2 { font-size: 1.2rem; }
+
+            .btn-option { padding: 14px; font-size: 0.95rem; }
+            
+            /* Ajustes nos Cards para Mobile */
+            .ranking-card { padding: 20px; }
+            .tool-name { font-size: 1.3rem; }
+            .pros-cons { grid-template-columns: 1fr; gap: 10px; } /* Uma coluna de prós/contras */
+            
+            /* Botão de restart fixo no topo ou fundo se preferir */
+            .restart-btn { padding: 15px; background: rgba(255,255,255,0.05); }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="nav-panel">
-        <h1>Seletor de IA</h1>
+        <h1>
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
+            Seletor de IA
+        </h1>
+        
         <div id="navContainer">
             </div>
-        <button id="btnRestart" class="restart-btn hidden">⟲ Nova Busca</button>
+
+        <button id="btnRestart" class="restart-btn hidden">⟲ Começar do Zero</button>
 
         <div class="app-footer">
             <a href="https://github.com/vsnepoifpe/llm-seletor" target="_blank">
-                <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-                </svg>
-                Código Fonte no GitHub
+                <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                GitHub Repo
             </a>
-            <div class="license-text">Apache-2.0 License</div>
+            <div class="license-text" style="font-size:0.7rem; opacity:0.5">Apache-2.0 License</div>
         </div>
     </div>
 
@@ -222,7 +282,7 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
             </svg>
-            <p style="font-size: 1.2rem;">Responda às perguntas à esquerda<br>para gerar seu ranking personalizado.</p>
+            <p>Selecione as opções no menu para gerar seu ranking.</p>
         </div>
         <div id="finalResults" class="hidden">
             </div>
@@ -232,158 +292,149 @@
 <script>
     /* --- 1. BASE DE DADOS (OUTCOMES) --- */
     const outcomes = {
-        // --- ACADÊMICO ---
         "academic_research": {
-            title: "Pesquisa Acadêmica: Validação & Busca",
-            expertTip: "O maior risco aqui é a **Alucinação de Citações**. Ferramentas como o ChatGPT padrão podem inventar papers. O critério decisivo aqui é 'Grounding' (a IA só responde baseada no PDF/Database).",
-            criteria_explained: "Confiabilidade da Fonte e Acesso direto ao PDF.",
+            title: "Pesquisa Acadêmica: Validação",
+            expertTip: "Foco em **Grounding** e **Veracidade**. Evite modelos criativos para fatos científicos.",
+            criteria_explained: "Confiabilidade da Fonte e Acesso ao PDF.",
             tools: [
-                { id: "consensus", name: "Consensus", rank: 1, tags: ["Busca", "Validado"], scores: { "Veracidade": 99, "Citações": 100, "Velocidade": 85 }, pros: "Usa apenas artigos peer-reviewed; Medidor de consenso científico.", cons: "Não serve para escrita criativa ou tradução.", link: "https://consensus.app" },
-                { id: "elicit", name: "Elicit", rank: 2, tags: ["Revisão", "Matriz"], scores: { "Veracidade": 95, "Profundidade": 100, "UX": 70 }, pros: "Gera matrizes (tabelas) comparando metodologia de 10+ papers.", cons: "Curva de aprendizado alta.", link: "https://elicit.com" },
-                { id: "perplexity", name: "Perplexity (Academic)", rank: 3, tags: ["Rápido", "Web"], scores: { "Veracidade": 85, "Amplitude": 95, "UX": 90 }, pros: "Excelente para descobrir tópicos recentes.", cons: "Pode misturar fontes jornalísticas com acadêmicas.", link: "https://perplexity.ai" }
+                { id: "consensus", name: "Consensus", rank: 1, tags: ["Validado"], scores: { "Veracidade": 99, "Citações": 100 }, pros: "Apenas artigos peer-reviewed; Medidor de consenso.", cons: "Não serve para escrita criativa.", link: "https://consensus.app" },
+                { id: "elicit", name: "Elicit", rank: 2, tags: ["Matriz"], scores: { "Veracidade": 95, "Profundidade": 100 }, pros: "Gera tabelas comparando papers.", cons: "Curva de aprendizado.", link: "https://elicit.com" },
+                { id: "perplexity", name: "Perplexity", rank: 3, tags: ["Web"], scores: { "Veracidade": 85, "Amplitude": 95 }, pros: "Descobre tópicos recentes.", cons: "Mistura fontes.", link: "https://perplexity.ai" }
             ]
         },
         "academic_study": {
-            title: "Estudo & Leitura: Flashcards e Resumos",
-            expertTip: "O objetivo aqui é **Redução de Carga Cognitiva**. Você quer digerir 50 páginas em 5 minutos. A ferramenta precisa identificar os pontos-chave sem perder a nuance.",
-            criteria_explained: "Capacidade de sintetização e interatividade com o texto.",
+            title: "Estudo: Resumos & Flashcards",
+            expertTip: "Foco em **Síntese**. Reduzir 50 páginas em 5 minutos.",
+            criteria_explained: "Capacidade de resumir sem perder o contexto.",
             tools: [
-                { id: "scholarcy", name: "Scholarcy", rank: 1, tags: ["Flashcards", "Resumo"], scores: { "Síntese": 95, "Estrutura": 90, "Preço": 70 }, pros: "Transforma papers em flashcards digeríveis; Extrai tabelas.", cons: "Interface um pouco datada.", link: "https://www.scholarcy.com" },
-                { id: "scispace", name: "SciSpace (Typeset)", rank: 2, tags: ["Explicação", "PDF"], scores: { "Interatividade": 95, "Matemática": 90, "Síntese": 80 }, pros: "Explica fórmulas matemáticas e tabelas ao passar o mouse.", cons: "Foca mais em um paper por vez.", link: "https://typeset.io" },
-                { id: "notebooklm", name: "NotebookLM", rank: 3, tags: ["Podcast", "Audio"], scores: { "Inovação": 100, "Síntese": 85, "Preço": 100 }, pros: "Cria podcasts de áudio sobre seus PDFs; Gratuito.", cons: "Menos rigoroso academicamente que o Scholarcy.", link: "https://notebooklm.google" }
+                { id: "scholarcy", name: "Scholarcy", rank: 1, tags: ["Flashcards"], scores: { "Síntese": 95, "Estrutura": 90 }, pros: "Transforma papers em flashcards.", cons: "UI antiga.", link: "https://www.scholarcy.com" },
+                { id: "scispace", name: "SciSpace", rank: 2, tags: ["Explicação"], scores: { "Interatividade": 95, "Matemática": 90 }, pros: "Explica fórmulas no PDF.", cons: "Foco paper único.", link: "https://typeset.io" },
+                { id: "notebooklm", name: "NotebookLM", rank: 3, tags: ["Audio"], scores: { "Inovação": 100, "Síntese": 85 }, pros: "Gera podcasts de estudo.", cons: "Menos rigor.", link: "https://notebooklm.google" }
             ]
         },
-
-        // --- ESCRITA & LÓGICA ---
         "logic_reasoning": {
-            title: "Raciocínio Lógico & Matemática (STEM)",
-            expertTip: "Modelos padrão 'adivinham' a próxima palavra. Modelos de **Reasoning** (como o1) 'pensam' antes de responder (Chain of Thought). Use para problemas onde só existe UMA resposta certa.",
-            criteria_explained: "Capacidade de resolver problemas complexos passo-a-passo.",
+            title: "Lógica & Matemática (STEM)",
+            expertTip: "Use modelos **Reasoning** (Chain of Thought) para evitar erros de cálculo.",
+            criteria_explained: "Raciocínio passo-a-passo.",
             tools: [
-                { id: "o1", name: "OpenAI o1", rank: 1, tags: ["SOTA", "Lógica"], scores: { "Raciocínio": 100, "Matemática": 98, "Velocidade": 30 }, pros: "O estado da arte em lógica e planejamento.", cons: "Muito lento e caro.", link: "https://chatgpt.com" },
-                { id: "wolfram", name: "WolframGPT", rank: 2, tags: ["Plugin", "Cálculo"], scores: { "Exatidão": 100, "Raciocínio": 80, "Integração": 70 }, pros: "Cálculo computacional exato (não alucina números).", cons: "Requer ChatGPT Plus.", link: "https://www.wolfram.com/gpt/" },
-                { id: "claude35", name: "Claude 3.5 Sonnet", rank: 3, tags: ["Equilíbrio"], scores: { "Raciocínio": 90, "Velocidade": 90, "Preço": 80 }, pros: "Muito inteligente e muito mais rápido que o o1.", cons: "Pode errar em matemática avançada.", link: "https://claude.ai" }
+                { id: "o1", name: "OpenAI o1", rank: 1, tags: ["SOTA"], scores: { "Raciocínio": 100, "Matemática": 98 }, pros: "Estado da arte em lógica.", cons: "Lento e caro.", link: "https://chatgpt.com" },
+                { id: "wolfram", name: "WolframGPT", rank: 2, tags: ["Cálculo"], scores: { "Exatidão": 100, "Raciocínio": 80 }, pros: "Cálculo exato.", cons: "Requer Plus.", link: "https://www.wolfram.com/gpt/" },
+                { id: "claude35", name: "Claude 3.5", rank: 3, tags: ["Equilíbrio"], scores: { "Raciocínio": 90, "Velocidade": 90 }, pros: "Inteligente e rápido.", cons: "Erra matemática complexa.", link: "https://claude.ai" }
             ]
         },
         "writing_copy": {
             title: "Escrita Criativa & Marketing",
-            expertTip: "Aqui a prioridade é **Estilo e Tom de Voz**. Você quer evitar o 'tom de robô' (palavras como 'delve', 'unlock', 'landscape'). Claude tende a ser mais humano que GPT.",
-            criteria_explained: "Naturalidade do texto e aderência ao estilo do usuário.",
+            expertTip: "Foco em **Naturalidade**. Evite o 'tom de robô'.",
+            criteria_explained: "Humanidade do texto.",
             tools: [
-                { id: "claude35", name: "Claude 3.5 Sonnet", rank: 1, tags: ["Humano", "Nuance"], scores: { "Criatividade": 98, "Naturalidade": 100, "Segurança": 90 }, pros: "Texto menos robótico do mercado; Entende nuances de tom.", cons: "Filtros de segurança às vezes restritivos.", link: "https://claude.ai" },
-                { id: "jasper", name: "Jasper", rank: 2, tags: ["Marketing", "Templates"], scores: { "Ferramentas": 95, "Criatividade": 80, "Preço": 40 }, pros: "Focado em empresas; Mantém a voz da marca.", cons: "Caro; Usa modelos de terceiros por baixo.", link: "https://www.jasper.ai" },
-                { id: "gpt4o", name: "GPT-4o", rank: 3, tags: ["Versátil"], scores: { "Criatividade": 85, "Naturalidade": 70, "Velocidade": 95 }, pros: "Ótimo para brainstorm e estruturas.", cons: "Tende a usar clichês e ser verboso.", link: "https://chatgpt.com" }
+                { id: "claude35", name: "Claude 3.5", rank: 1, tags: ["Humano"], scores: { "Criatividade": 98, "Tom": 100 }, pros: "Texto menos robótico.", cons: "Filtros rígidos.", link: "https://claude.ai" },
+                { id: "jasper", name: "Jasper", rank: 2, tags: ["Marketing"], scores: { "Ferramentas": 95, "Tom": 80 }, pros: "Voz da marca.", cons: "Caro.", link: "https://www.jasper.ai" },
+                { id: "gpt4o", name: "GPT-4o", rank: 3, tags: ["Versátil"], scores: { "Criatividade": 85, "Velocidade": 95 }, pros: "Bom para brainstorm.", cons: "Verborrágico.", link: "https://chatgpt.com" }
             ]
         },
-
-        // --- DOCUMENTOS (RAG) ---
         "rag_deep": {
-            title: "Análise Profunda de Dados (Deep RAG)",
-            expertTip: "Para analisar 20 PDFs ou um livro inteiro, você precisa de **Janela de Contexto Grande**. Ferramentas de chat simples perdem o 'fio da meada' em arquivos grandes.",
-            criteria_explained: "Capacidade de 'segurar' muita informação na memória.",
+            title: "Análise Profunda (Livros/Docs)",
+            expertTip: "Exige **Janela de Contexto** massiva.",
+            criteria_explained: "Capacidade de leitura (+1M tokens).",
             tools: [
-                { id: "gemini15", name: "Gemini 1.5 Pro", rank: 1, tags: ["2M Tokens", "Massivo"], scores: { "Contexto": 100, "Análise": 90, "UX": 60 }, pros: "Lê vídeos de 1h, milhares de linhas de código ou livros inteiros.", cons: "Interface AI Studio é para devs/avançados.", link: "https://aistudio.google.com" },
-                { id: "notebooklm", name: "NotebookLM", rank: 2, tags: ["Google", "Estudo"], scores: { "Contexto": 90, "Organização": 95, "Preço": 100 }, pros: "Cria uma wiki dos seus documentos.", cons: "Às vezes simplifica demais.", link: "https://notebooklm.google" },
-                { id: "claude_opus", name: "Claude 3 Opus", rank: 3, tags: ["Qualidade"], scores: { "Contexto": 80, "Análise": 98, "Preço": 50 }, pros: "A melhor compreensão de texto complexo.", cons: "Janela menor que Gemini (200k vs 2M).", link: "https://claude.ai" }
+                { id: "gemini15", name: "Gemini 1.5 Pro", rank: 1, tags: ["2M Tokens"], scores: { "Contexto": 100, "Análise": 90 }, pros: "Lê livros inteiros.", cons: "UX complexa.", link: "https://aistudio.google.com" },
+                { id: "notebooklm", name: "NotebookLM", rank: 2, tags: ["Google"], scores: { "Contexto": 90, "Organização": 95 }, pros: "Wiki de documentos.", cons: "Simplifica.", link: "https://notebooklm.google" },
+                { id: "claude_opus", name: "Claude Opus", rank: 3, tags: ["Qualidade"], scores: { "Contexto": 80, "Análise": 98 }, pros: "Compreensão profunda.", cons: "Contexto menor.", link: "https://claude.ai" }
             ]
         },
         "rag_quick": {
-            title: "Chat Rápido com Docs (Quick RAG)",
-            expertTip: "Para quando você só quer achar uma cláusula num contrato ou uma data num edital. Velocidade e citação precisa são o foco.",
-            criteria_explained: "Velocidade e precisão na citação.",
+            title: "Chat Rápido com PDF",
+            expertTip: "Foco em **Velocidade** e Citação.",
+            criteria_explained: "Precisão na citação.",
             tools: [
-                { id: "humata", name: "Humata", rank: 1, tags: ["Jurídico", "Preciso"], scores: { "Citação": 100, "Velocidade": 90, "Preço": 40 }, pros: "Highlight exato no PDF; Focado em documentos complexos.", cons: "Versão free limitada.", link: "https://humata.ai" },
-                { id: "chatpdf", name: "ChatPDF", rank: 2, tags: ["Simples", "Rápido"], scores: { "UX": 100, "Citação": 80, "Profundidade": 60 }, pros: "Sem login complexo; Muito rápido.", cons: "Não lida bem com múltiplos arquivos cruzados.", link: "https://www.chatpdf.com" },
-                { id: "acrobat", name: "Adobe Acrobat AI", rank: 3, tags: ["Nativo"], scores: { "Integração": 100, "Inteligência": 60, "Preço": 50 }, pros: "Já está no seu leitor de PDF.", cons: "Inteligência inferior aos modelos dedicados.", link: "https://adobe.com" }
+                { id: "humata", name: "Humata", rank: 1, tags: ["Preciso"], scores: { "Citação": 100, "Velocidade": 90 }, pros: "Highlight exato.", cons: "Versão free limitada.", link: "https://humata.ai" },
+                { id: "chatpdf", name: "ChatPDF", rank: 2, tags: ["Rápido"], scores: { "UX": 100, "Citação": 80 }, pros: "Sem login.", cons: "Arquivos únicos.", link: "https://www.chatpdf.com" },
+                { id: "acrobat", name: "Acrobat AI", rank: 3, tags: ["Nativo"], scores: { "Integração": 100, "Inteligência": 60 }, pros: "Já no leitor.", cons: "Fraco.", link: "https://adobe.com" }
             ]
         },
-
-        // --- CODING ---
         "coding_pro": {
-            title: "Coding: Desenvolvimento Profissional",
-            expertTip: "A IA deve ser sua 'Pair Programmer'. A integração com a IDE (VS Code) é mais importante que o modelo isolado.",
-            criteria_explained: "Integração com ambiente de trabalho e qualidade do código.",
+            title: "Coding Profissional",
+            expertTip: "A **IDE** é mais importante que o modelo.",
+            criteria_explained: "Integração e DX.",
             tools: [
-                { id: "cursor", name: "Cursor", rank: 1, tags: ["IDE", "Game Changer"], scores: { "DX": 100, "Inteligência": 95, "Velocidade": 90 }, pros: "Edita múltiplas linhas; Entende todo o projeto.", cons: "Exige troca de editor.", link: "https://cursor.sh" },
-                { id: "claude35", name: "Claude 3.5 Sonnet", rank: 2, tags: ["Modelo Puro"], scores: { "Lógica": 98, "DX": 40, "Bugs": 95 }, pros: "Melhor lógica de programação atual.", cons: "Copia/Cola do navegador.", link: "https://claude.ai" },
-                { id: "github_copilot", name: "GitHub Copilot", rank: 3, tags: ["Padrão"], scores: { "DX": 90, "Inteligência": 75, "Preço": 80 }, pros: "Já está na maioria das empresas.", cons: "Modelo (GPT-4) está ficando defasado vs Claude.", link: "https://github.com/features/copilot" }
+                { id: "cursor", name: "Cursor", rank: 1, tags: ["IDE"], scores: { "DX": 100, "Inteligência": 95 }, pros: "Entende o projeto todo.", cons: "Trocar de editor.", link: "https://cursor.sh" },
+                { id: "claude35", name: "Claude 3.5", rank: 2, tags: ["Lógica"], scores: { "Lógica": 98, "DX": 40 }, pros: "Melhor lógica.", cons: "Copy/Paste.", link: "https://claude.ai" },
+                { id: "copilot", name: "GitHub Copilot", rank: 3, tags: ["Padrão"], scores: { "DX": 90, "Inteligência": 75 }, pros: "Onipresente.", cons: "Modelo defasado.", link: "https://github.com/features/copilot" }
             ]
         },
         "coding_local": {
-            title: "Coding: Local & Privacidade",
-            expertTip: "Para quando o código é proprietário e não pode ir para a nuvem. Depende da sua GPU.",
-            criteria_explained: "Performance por Watt e Privacidade.",
+            title: "Coding Local (Privacidade)",
+            expertTip: "Depende da sua **GPU**.",
+            criteria_explained: "Performance vs Hardware.",
             tools: [
-                { id: "deepseek", name: "DeepSeek Coder V2", rank: 1, tags: ["Open Source"], scores: { "Código": 95, "Leveza": 60, "Setup": 50 }, pros: "Rivaliza GPT-4; Janela grande.", cons: "Pesado para máquinas simples.", link: "https://github.com/deepseek-ai" },
-                { id: "qwen", name: "Qwen 2.5 Coder", rank: 2, tags: ["Eficiente"], scores: { "Código": 90, "Leveza": 90, "Setup": 60 }, pros: "Roda bem em notebooks gamers.", cons: "Menos filtros de segurança.", link: "https://huggingface.co/Qwen" },
-                { id: "ollama", name: "Ollama (Runner)", rank: 3, tags: ["Ferramenta"], scores: { "UX": 100, "Flexibilidade": 100, "Código": 0 }, pros: "A maneira mais fácil de rodar Llama/Deepseek.", cons: "É apenas o executor, não o modelo.", link: "https://ollama.com" }
+                { id: "deepseek", name: "DeepSeek V2", rank: 1, tags: ["Open Source"], scores: { "Código": 95, "Leveza": 60 }, pros: "Nível GPT-4.", cons: "Pesado.", link: "https://github.com/deepseek-ai" },
+                { id: "qwen", name: "Qwen 2.5", rank: 2, tags: ["Eficiente"], scores: { "Código": 90, "Leveza": 90 }, pros: "Roda em notebook.", cons: "Menos filtros.", link: "https://huggingface.co/Qwen" },
+                { id: "ollama", name: "Ollama", rank: 3, tags: ["Runner"], scores: { "UX": 100, "Flexibilidade": 100 }, pros: "Fácil de rodar.", cons: "Apenas executor.", link: "https://ollama.com" }
             ]
         },
-
-        // --- MULTIMÍDIA ---
         "image_gen": {
             title: "Geração de Imagens",
-            expertTip: "Escolha: **Midjourney** para arte/beleza pura. **Flux** para realismo e seguir prompts difíceis. **Ideogram** se tiver texto escrito na imagem.",
-            criteria_explained: "Estética vs. Obediência ao Prompt.",
+            expertTip: "Estética vs Obediência ao Prompt.",
+            criteria_explained: "Qualidade visual.",
             tools: [
-                { id: "midjourney", name: "Midjourney v6", rank: 1, tags: ["Estética"], scores: { "Beleza": 100, "Texto": 60, "Acesso": 40 }, pros: "Imbatível visualmente.", cons: "Uso via Discord é ruim.", link: "https://midjourney.com" },
-                { id: "flux", name: "Flux.1", rank: 2, tags: ["Prompt", "Realismo"], scores: { "Beleza": 90, "Obediência": 100, "Texto": 80 }, pros: "Segue instruções complexas perfeitamente.", cons: "Requer bom hardware local ou API paga.", link: "https://blackforestlabs.ai" },
-                { id: "ideogram", name: "Ideogram", rank: 3, tags: ["Tipografia"], scores: { "Texto": 100, "Beleza": 80, "Criatividade": 85 }, pros: "Escreve nomes e logos corretamente.", cons: "Resolução menor às vezes.", link: "https://ideogram.ai" }
+                { id: "midjourney", name: "Midjourney", rank: 1, tags: ["Arte"], scores: { "Beleza": 100, "Texto": 60 }, pros: "Imbatível visualmente.", cons: "Discord.", link: "https://midjourney.com" },
+                { id: "flux", name: "Flux.1", rank: 2, tags: ["Prompt"], scores: { "Beleza": 90, "Obediência": 100 }, pros: "Segue prompts complexos.", cons: "Hardware local.", link: "https://blackforestlabs.ai" },
+                { id: "ideogram", name: "Ideogram", rank: 3, tags: ["Texto"], scores: { "Texto": 100, "Beleza": 80 }, pros: "Escreve textos.", cons: "Resolução.", link: "https://ideogram.ai" }
             ]
         },
         "video_creative": {
-            title: "Vídeo: Criação Cinematográfica",
-            expertTip: "Vídeo é a fronteira mais cara e lenta. A consistência (o personagem não mudar de rosto) é o Santo Graal.",
-            criteria_explained: "Consistência temporal e controle de câmera.",
+            title: "Vídeo Criativo",
+            expertTip: "Consistência temporal é o desafio.",
+            criteria_explained: "Controle e Realismo.",
             tools: [
-                { id: "runway", name: "Runway Gen-3", rank: 1, tags: ["Controle"], scores: { "Controle": 95, "Realismo": 90, "Custo": 40 }, pros: "Motion Brush (pinta o que move).", cons: "Caro.", link: "https://runwayml.com" },
-                { id: "luma", name: "Luma Dream Machine", rank: 2, tags: ["Rápido"], scores: { "Velocidade": 95, "Física": 85, "Custo": 80 }, pros: "Gera vídeos de 5s rápido; Plano free bom.", cons: "Menos controle que o Runway.", link: "https://lumalabs.ai" },
-                { id: "kling", name: "Kling AI", rank: 3, tags: ["Novo", "Longos"], scores: { "Duração": 100, "Realismo": 95, "Acesso": 50 }, pros: "Vídeos de até 10s muito realistas.", cons: "Filas de espera longas.", link: "https://klingai.com" }
+                { id: "runway", name: "Runway Gen-3", rank: 1, tags: ["Controle"], scores: { "Controle": 95, "Realismo": 90 }, pros: "Motion Brush.", cons: "Caro.", link: "https://runwayml.com" },
+                { id: "luma", name: "Luma Dream", rank: 2, tags: ["Rápido"], scores: { "Velocidade": 95, "Física": 85 }, pros: "Gera rápido.", cons: "Menos controle.", link: "https://lumalabs.ai" },
+                { id: "kling", name: "Kling AI", rank: 3, tags: ["Realismo"], scores: { "Duração": 100, "Realismo": 95 }, pros: "Vídeos longos.", cons: "Fila de espera.", link: "https://klingai.com" }
             ]
         },
         "video_avatar": {
-            title: "Vídeo: Avatares & Apresentações",
-            expertTip: "Usado para treinamentos e marketing. O foco é 'Lip Sync' (sincronia labial) perfeito.",
-            criteria_explained: "Naturalidade da fala e movimento labial.",
+            title: "Vídeo Avatar",
+            expertTip: "Foco em **Lip Sync**.",
+            criteria_explained: "Naturalidade da fala.",
             tools: [
-                { id: "heygen", name: "HeyGen", rank: 1, tags: ["LipSync"], scores: { "Sincronia": 100, "Tradução": 100, "Preço": 40 }, pros: "Dubla vídeos mantendo sua voz original.", cons: "Marca d'água no free.", link: "https://www.heygen.com" },
-                { id: "synthesia", name: "Synthesia", rank: 2, tags: ["Corporativo"], scores: { "Avatares": 90, "Edição": 90, "Preço": 50 }, pros: "Ótimo editor de slides embutido.", cons: "Avatares um pouco mais rígidos que HeyGen.", link: "https://www.synthesia.io" },
-                { id: "did", name: "D-ID", rank: 3, tags: ["API"], scores: { "Foto": 90, "Vídeo": 70, "Preço": 70 }, pros: "Anima fotos estáticas muito bem.", cons: "Menos realista para vídeo full.", link: "https://www.d-id.com" }
+                { id: "heygen", name: "HeyGen", rank: 1, tags: ["LipSync"], scores: { "Sincronia": 100, "Tradução": 100 }, pros: "Dublagem perfeita.", cons: "Marca d'água.", link: "https://www.heygen.com" },
+                { id: "synthesia", name: "Synthesia", rank: 2, tags: ["Corp"], scores: { "Avatares": 90, "Edição": 90 }, pros: "Slides embutidos.", cons: "Rígido.", link: "https://www.synthesia.io" },
+                { id: "did", name: "D-ID", rank: 3, tags: ["Foto"], scores: { "Foto": 90, "Vídeo": 70 }, pros: "Anima fotos.", cons: "Menos real.", link: "https://www.d-id.com" }
             ]
         },
         "audio_tts": {
-            title: "Áudio: Voz Sintética (TTS)",
-            expertTip: "A métrica é 'Emoção'. Vozes robóticas já eram. Agora buscamos pausas, respiração e entonação.",
-            criteria_explained: "Humanidade e capacidade de clonagem.",
+            title: "Voz Sintética (TTS)",
+            expertTip: "Foco em **Emoção** e Clonagem.",
+            criteria_explained: "Humanidade.",
             tools: [
-                { id: "elevenlabs", name: "ElevenLabs", rank: 1, tags: ["SOTA", "Clonagem"], scores: { "Emoção": 100, "Clonagem": 100, "Preço": 60 }, pros: "Indistinguível de humanos; Clona voz com 1min de áudio.", cons: "Custo por caractere.", link: "https://elevenlabs.io" },
-                { id: "openai_voice", name: "OpenAI Audio", rank: 2, tags: ["Latência"], scores: { "Velocidade": 100, "Emoção": 90, "Custo": 80 }, pros: "Vozes do ChatGPT; Muito expressivas.", cons: "Menos customizável que ElevenLabs.", link: "https://platform.openai.com/docs/guides/text-to-speech" },
-                { id: "playht", name: "Play.ht", rank: 3, tags: ["Modelos"], scores: { "Variedade": 90, "Emoção": 85, "Preço": 70 }, pros: "Muitos modelos de voz diferentes.", cons: "Interface um pouco confusa.", link: "https://play.ht" }
+                { id: "elevenlabs", name: "ElevenLabs", rank: 1, tags: ["SOTA"], scores: { "Emoção": 100, "Clonagem": 100 }, pros: "Indistinguível.", cons: "Custo.", link: "https://elevenlabs.io" },
+                { id: "openai_voice", name: "OpenAI", rank: 2, tags: ["Rápido"], scores: { "Velocidade": 100, "Emoção": 90 }, pros: "Expressivo.", cons: "Pouca customização.", link: "https://platform.openai.com" },
+                { id: "playht", name: "Play.ht", rank: 3, tags: ["Variedade"], scores: { "Variedade": 90, "Emoção": 85 }, pros: "Muitos modelos.", cons: "UI.", link: "https://play.ht" }
             ]
         },
         "audio_transcribe": {
-            title: "Áudio: Transcrição & Atas",
-            expertTip: "WER (Word Error Rate) é a métrica. Ferramentas boas distinguem quem está falando (Diarization).",
-            criteria_explained: "Precisão na transcrição e identificação de falantes.",
+            title: "Transcrição",
+            expertTip: "Foco em **Diarization** (quem fala o que).",
+            criteria_explained: "Precisão.",
             tools: [
-                { id: "sonix", name: "Sonix", rank: 1, tags: ["Profissional"], scores: { "Precisão": 98, "Edição": 100, "Preço": 50 }, pros: "Melhor editor de texto sincronizado ao áudio.", cons: "Pago por hora.", link: "https://sonix.ai" },
-                { id: "otter", name: "Otter.ai", rank: 2, tags: ["Reuniões"], scores: { "Automação": 100, "Precisão": 85, "Preço": 90 }, pros: "Entra no Zoom sozinho; Gera ata.", cons: "Suporte a Português varia.", link: "https://otter.ai" },
-                { id: "whisper", name: "OpenAI Whisper", rank: 3, tags: ["Open Source"], scores: { "Precisão": 95, "Custo": 100, "UX": 20 }, pros: "Gratuito (se rodar local); Melhor modelo base.", cons: "Requer conhecimento técnico para instalar.", link: "https://github.com/openai/whisper" }
+                { id: "sonix", name: "Sonix", rank: 1, tags: ["Pro"], scores: { "Precisão": 98, "Edição": 100 }, pros: "Melhor editor.", cons: "Caro.", link: "https://sonix.ai" },
+                { id: "otter", name: "Otter", rank: 2, tags: ["Meet"], scores: { "Automação": 100, "Precisão": 85 }, pros: "Entra no Zoom.", cons: "Português varia.", link: "https://otter.ai" },
+                { id: "whisper", name: "Whisper", rank: 3, tags: ["Free"], scores: { "Precisão": 95, "Custo": 100 }, pros: "Gratuito (Local).", cons: "Técnico.", link: "https://github.com/openai/whisper" }
             ]
         }
     };
 
-    /* --- 2. ÁRVORE DE DECISÃO (DECISION TREE) --- */
+    /* --- 2. ÁRVORE DE DECISÃO --- */
     const decisionTree = {
         question: "Qual o seu objetivo principal?",
         options: [
             {
-                label: "Pesquisa Acadêmica & Estudo",
+                label: "Pesquisa & Estudo Acadêmico",
                 next: {
                     question: "O que você quer fazer?",
                     options: [
-                        { label: "Validar fatos & Revisão Bibliográfica", resultId: "academic_research" },
-                        { label: "Estudar, Resumir & Flashcards", resultId: "academic_study" }
+                        { label: "Validar Fatos & Referências", resultId: "academic_research" },
+                        { label: "Resumir & Criar Flashcards", resultId: "academic_study" }
                     ]
                 }
             },
@@ -392,8 +443,8 @@
                 next: {
                     question: "Qual o tipo de tarefa?",
                     options: [
-                        { label: "Lógica Pura, Matemática ou Planejamento", resultId: "logic_reasoning" },
-                        { label: "Marketing, Copywriting & Criatividade", resultId: "writing_copy" }
+                        { label: "Lógica, Matemática, STEM", resultId: "logic_reasoning" },
+                        { label: "Marketing & Criatividade", resultId: "writing_copy" }
                     ]
                 }
             },
@@ -402,37 +453,34 @@
                 next: {
                     question: "Ambiente de Desenvolvimento?",
                     options: [
-                        { label: "Profissional (Produtividade na IDE)", resultId: "coding_pro" },
+                        { label: "Profissional (Produtividade)", resultId: "coding_pro" },
                         { label: "Local / Offline (Privacidade)", resultId: "coding_local" }
                     ]
                 }
             },
             {
-                label: "Documentos & Dados (RAG)",
+                label: "Documentos (RAG)",
                 next: {
-                    question: "Complexidade da Análise?",
+                    question: "Volume de Dados?",
                     options: [
-                        { label: "Análise Profunda (Livros/Múltiplos Docs)", resultId: "rag_deep" },
-                        { label: "Busca Rápida (Contratos/Faturas)", resultId: "rag_quick" }
+                        { label: "Livros / Múltiplos Docs", resultId: "rag_deep" },
+                        { label: "Busca Rápida em PDF", resultId: "rag_quick" }
                     ]
                 }
             },
             {
-                label: "Multimídia (Imagem/Vídeo/Áudio)",
+                label: "Multimídia (Img/Vid/Audio)",
                 next: {
-                    question: "Qual tipo de mídia?",
+                    question: "Tipo de Mídia?",
                     options: [
-                        { 
-                            label: "Imagens", 
-                            resultId: "image_gen" 
-                        },
+                        { label: "Gerar Imagens", resultId: "image_gen" },
                         { 
                             label: "Vídeo", 
                             next: {
                                 question: "Estilo do Vídeo?",
                                 options: [
-                                    { label: "Criativo / Cinematográfico", resultId: "video_creative" },
-                                    { label: "Avatares Falantes / Corporativo", resultId: "video_avatar" }
+                                    { label: "Criativo / Cinema", resultId: "video_creative" },
+                                    { label: "Avatar / Corporativo", resultId: "video_avatar" }
                                 ]
                             }
                         },
@@ -441,8 +489,8 @@
                             next: {
                                 question: "Entrada ou Saída?",
                                 options: [
-                                    { label: "Criar Voz (Text-to-Speech)", resultId: "audio_tts" },
-                                    { label: "Transcrever Áudio (Speech-to-Text)", resultId: "audio_transcribe" }
+                                    { label: "Criar Voz (TTS)", resultId: "audio_tts" },
+                                    { label: "Transcrever (STT)", resultId: "audio_transcribe" }
                                 ]
                             }
                         }
@@ -452,14 +500,14 @@
         ]
     };
 
-    /* --- 3. LÓGICA DE EXECUÇÃO --- */
+    /* --- 3. LÓGICA --- */
     const navContainer = document.getElementById('navContainer');
     const finalResults = document.getElementById('finalResults');
     const placeholder = document.getElementById('placeholderState');
     const btnRestart = document.getElementById('btnRestart');
+    const resultsPanel = document.getElementById('resultsPanel');
 
     function renderQuestion(step) {
-        // Criação da div da pergunta com animação
         const qDiv = document.createElement('div');
         qDiv.className = 'question-box';
         
@@ -472,14 +520,13 @@
             btn.className = 'btn-option';
             btn.innerText = opt.label;
             btn.onclick = () => {
-                // Desabilitar botões irmãos para indicar escolha
+                // Trava botões anteriores
                 Array.from(qDiv.querySelectorAll('.btn-option')).forEach(b => {
                     b.disabled = true;
                     if(b !== btn) b.style.opacity = '0.5';
                 });
                 btn.classList.add('selected');
 
-                // Lógica de navegação
                 if (opt.next) {
                     renderQuestion(opt.next);
                 } else if (opt.resultId) {
@@ -491,9 +538,9 @@
 
         navContainer.appendChild(qDiv);
         
-        // Auto-scroll suave para a nova pergunta
+        // Auto-scroll suave
         setTimeout(() => {
-            qDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            qDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     }
 
@@ -505,39 +552,30 @@
         finalResults.classList.remove('hidden');
         btnRestart.classList.remove('hidden');
         
-        // Limpa e reconstrói resultados
         finalResults.innerHTML = ''; 
 
-        // 1. Cabeçalho e Dica de Especialista
         const headerHTML = `
-            <div style="margin-bottom: 30px; animation: fadeIn 0.5s ease;">
-                <h1 style="margin:0; font-size: 1rem; color: var(--text-muted);">Ranking Recomendado</h1>
-                <h2 style="margin-top:5px; font-size: 2rem;">${data.title}</h2>
+            <div style="margin-bottom: 25px; animation: fadeIn 0.5s ease;">
+                <h1 style="margin:0; font-size: 0.9rem; color: var(--text-muted); text-transform:uppercase;">Ranking Recomendado</h1>
+                <h2 style="margin-top:5px; font-size: 1.8rem; color: var(--accent);">${data.title}</h2>
             </div>
             
             <div class="expert-tip" style="animation: fadeIn 0.7s ease;">
-                <h4>
-                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    A Visão do Especialista
-                </h4>
-                <p style="margin:0; line-height: 1.6;">${data.expertTip}</p>
-                <div style="margin-top:15px; font-size:0.85rem; color:var(--text-muted); background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; display:inline-block;">
-                    <strong>Critério de Desempate:</strong> ${data.criteria_explained}
+                <h4>Visão do Especialista</h4>
+                <p style="margin:0; line-height: 1.5;">${data.expertTip}</p>
+                <div style="margin-top:10px; font-size:0.8rem; opacity:0.8;">
+                    <strong>Fator de Decisão:</strong> ${data.criteria_explained}
                 </div>
             </div>
         `;
         finalResults.innerHTML += headerHTML;
 
-        // 2. Cards de Ferramentas
         data.tools.forEach((tool, index) => {
-            // Gera barras de score dinâmicas
             let scoresHTML = '';
             for (const [key, value] of Object.entries(tool.scores)) {
-                // Define cor baseada na nota
                 let color = 'var(--accent)';
-                if(value < 50) color = 'var(--danger)';
-                else if(value > 90) color = 'var(--success)';
-
+                if(value < 60) color = 'var(--silver)';
+                
                 scoresHTML += `
                     <div class="score-item">
                         <label>${key}</label>
@@ -550,7 +588,6 @@
 
             const card = document.createElement('div');
             card.className = 'ranking-card';
-            // Delay escalonado para animação de entrada
             card.style.animationDelay = `${index * 0.1}s`; 
             
             card.innerHTML = `
@@ -567,26 +604,25 @@
                 </div>
 
                 <div class="pros-cons">
-                    <div class="pros"><strong>✓ Prós:</strong> ${tool.pros}</div>
-                    <div class="cons"><strong>⚠ Contras:</strong> ${tool.cons}</div>
+                    <div class="pros"><strong>✓</strong> ${tool.pros}</div>
+                    <div class="cons"><strong>⚠</strong> ${tool.cons}</div>
                 </div>
 
-                <div style="text-align:right; margin-top:20px;">
-                    <a href="${tool.link}" target="_blank" class="action-link">
-                        Visitar Site ➔
-                    </a>
-                </div>
+                <a href="${tool.link}" target="_blank" class="action-link">
+                    Acessar Ferramenta
+                </a>
             `;
             finalResults.appendChild(card);
         });
-        
-        // Scroll para o topo dos resultados em mobile
-        if(window.innerWidth < 800) {
-            resultsPanel.scrollIntoView({ behavior: 'smooth' });
+
+        // AUTO SCROLL PARA RESULTADOS (CRUCIAL NO MOBILE)
+        if(window.innerWidth <= 900) {
+            setTimeout(() => {
+                resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
         }
     }
 
-    // Inicialização
     function init() {
         navContainer.innerHTML = '';
         finalResults.innerHTML = '';
@@ -594,11 +630,12 @@
         placeholder.classList.remove('hidden');
         btnRestart.classList.add('hidden');
         renderQuestion(decisionTree);
+        
+        // Scroll topo
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     btnRestart.onclick = init;
-    
-    // Start
     init();
 
 </script>
